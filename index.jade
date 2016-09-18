@@ -1,0 +1,16 @@
+.clock
+	each type, index in ['hours', 'minutes', 'seconds']
+		div(class="digit #{type}-tens")
+			each i in new Array(7)
+				span
+		div(class="digit #{type}-ones")
+			each i in new Array(7)
+				span
+		if index != 2
+			div.colon
+
+.weather
+	.icon
+	.min
+	.current
+	.max

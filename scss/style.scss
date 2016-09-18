@@ -1,0 +1,307 @@
+$digit-color: #FFF;
+$band-thickness: 3px;
+$digit-width: 50px;
+$digit-height: $digit-width * 1.61803398875; /* golden ratio */
+$digit-middle: ($digit-height / 2);
+$band-middle: ($band-thickness / 2);
+$midpoint:  $digit-middle - $band-middle;
+$taper-width: $band-thickness + 1px;
+$clock-width: ($digit-width * 6) + ($band-thickness * 2) + (10 * 4 * 2);
+
+@mixin taper-before (
+	$horizontal: false,
+	$position: $band-thickness
+) {
+	&:before {
+		@content;
+		@if $horizontal == true {
+			left: -$position;
+		} @else {
+			top: -$position;
+		}
+	}
+}
+
+@mixin taper-after(
+	$horizontal: false,
+	$position: $band-thickness
+) {
+	&:after {
+		@content;
+		@if $horizontal == true {
+			right: -$position;
+		} @else {
+			bottom: -$position;
+		}
+	}
+}
+
+body {
+	background-color: #000;
+	width: 100%;
+}
+
+.clock {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: $clock-width;
+	height: $digit-height;
+	margin-left: -($clock-width / 2);
+	margin-top: -($digit-height / 2);
+}
+
+.digit {
+	height: $digit-height;
+	width: $digit-width;
+	position: relative;
+	display: inline-block;
+	margin: 0 4px;
+	
+	span {
+		position: absolute;
+		background-color: $digit-color;
+		border-color: $digit-color;
+		opacity: 0.03;
+		transition: 0.25s;
+		
+		&:before,
+		&:after {
+			content: '';
+			position: absolute;
+			width: 0;
+			height: 0;
+			border: $band-thickness solid transparent;
+		}
+		
+		&:nth-child(-n+3) {
+			height: $band-thickness;
+			width: $digit-width - (2 * $taper-width);
+			left: $taper-width;
+		}
+
+		&:nth-child(n+4) {
+			width: $band-thickness;
+			height: $midpoint - (2 * $taper-width);
+		}
+		
+		&:nth-child(4),
+		&:nth-child(6) {
+			left: 0;
+			@include taper-before {
+				border-width: 0 $band-thickness $band-thickness 0;
+				border-bottom-color: inherit;
+			}
+			@include taper-after {
+				border-width: 0 0 $band-thickness $band-thickness;
+				border-left-color: inherit;
+			}
+		}
+		
+		&:nth-child(5),
+		&:nth-child(7) {
+			right: 0;
+			@include taper-before {
+				border-width: 0 0 $band-thickness $band-thickness;
+				border-bottom-color: inherit;
+			}
+			@include taper-after {
+				border-width: $band-thickness 0 0 $band-thickness;
+				border-top-color: inherit;
+			}
+		}
+		
+		&:nth-child(4),
+		&:nth-child(5) {
+			top: $taper-width;
+		}
+		
+		&:nth-child(6),
+		&:nth-child(7) {
+			top: $midpoint + ($taper-width / 2);
+		}
+		
+
+		&:first-child {
+			top: 0px;
+			@include taper-before(true) {
+				border-width: 0 $band-thickness $band-thickness 0;
+				border-right-color: inherit;
+			}
+			@include taper-after(true) {
+				border-width: 0 0 $band-thickness $band-thickness;
+				border-left-color: inherit;
+			}
+		}
+
+		&:nth-child(2) {
+			top: $midpoint - ($taper-width / 2);
+			@include taper-before(true, $band-thickness - 1) {
+				border-width: $band-thickness / 2;
+				border-right-color: inherit;
+			}
+			@include taper-after(true, $band-thickness - 1) {
+				border-width: $band-thickness / 2;
+				border-left-color: inherit;
+			}
+		}
+
+		&:nth-child(3) {
+			top: 2 * ($midpoint - $band-thickness);
+			@include taper-before(true) {
+				border-width: $band-thickness $band-thickness 0 0;
+				border-right-color: inherit;
+			}
+			@include taper-after(true) {
+				border-width: $band-thickness 0 0 $band-thickness;
+				border-left-color: inherit;
+			}
+		}
+	}
+}
+
+@for $i from 1 through 7 {
+	%show-band-#{$i} {
+		span:nth-child(#{$i}) {
+			opacity: 1;
+		}
+	}
+}
+
+.digit {
+	
+	&[data-digit="0"],
+	&[data-digit="2"],
+	&[data-digit="3"],
+	&[data-digit="5"],
+	&[data-digit="6"],
+	&[data-digit="7"],
+	&[data-digit="8"],
+	&[data-digit="9"] {
+		@extend %show-band-1;
+	}
+	
+	&[data-digit="2"],
+	&[data-digit="3"],
+	&[data-digit="4"],
+	&[data-digit="5"],
+	&[data-digit="6"],
+	&[data-digit="8"],
+	&[data-digit="9"] {
+		@extend %show-band-2;
+	}
+	
+	&[data-digit="0"],
+	&[data-digit="2"],
+	&[data-digit="3"],
+	&[data-digit="5"],
+	&[data-digit="6"],
+	&[data-digit="8"],
+	&[data-digit="9"] {
+		@extend %show-band-3;
+	}
+	
+	&[data-digit="0"],
+	&[data-digit="4"],
+	&[data-digit="5"],
+	&[data-digit="6"],
+	&[data-digit="8"],
+	&[data-digit="9"] {
+		@extend %show-band-4;
+	}
+	
+	&[data-digit="0"],
+	&[data-digit="1"],
+	&[data-digit="2"],
+	&[data-digit="3"],
+	&[data-digit="4"],
+	&[data-digit="7"],
+	&[data-digit="8"],
+	&[data-digit="9"] {
+		@extend %show-band-5;
+	}
+	
+	&[data-digit="0"],
+	&[data-digit="2"],
+	&[data-digit="6"],
+	&[data-digit="8"] {
+		@extend %show-band-6;
+	}
+	
+	&[data-digit="0"],
+	&[data-digit="1"],
+	&[data-digit="3"],
+	&[data-digit="4"],
+	&[data-digit="5"],
+	&[data-digit="6"],
+	&[data-digit="7"],
+	&[data-digit="8"],
+	&[data-digit="9"] {
+		@extend %show-band-7;
+	}
+
+}
+
+.colon {
+	width: $band-thickness;
+	height: $digit-height;
+	display: inline-block;
+	position: relative;
+	
+	&:before,
+	&:after {
+		content: ' ';
+		position: absolute;
+		width: 100%;
+		height: $band-thickness;
+		background-color: $digit-color;
+	}
+	
+	&:before {
+		top: $digit-middle / 1.75;
+	}
+	
+	&:after {
+		bottom: $digit-middle / 1.75;
+	}
+}
+
+.weather {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	display: flex;
+	box-sizing: border-box;
+	font-family: 'Space Mono', monospace;
+	color: #fff;
+	background-color: #0e0e0e;
+	
+	div {
+		padding: 10px;
+		text-align: center;
+	}
+	
+	.icon { background-color: #2888a5; }
+	
+	.min { background-color: #5FAF8F; }
+
+	.current { 
+		background-color: #1b1b1b; 
+		width: 100%;
+		position: relative;
+		font-weight: 700;
+		
+		&::before {
+			content: '';
+			position: absolute;
+			width: 100%;
+			height: 3px;
+			top: 0;
+			left: 0;
+			background: linear-gradient(to right, #5FAF8F 0%, #FC3A45 100%);
+		}
+	}
+
+	.max { background-color: #FC3A45; }
+}
